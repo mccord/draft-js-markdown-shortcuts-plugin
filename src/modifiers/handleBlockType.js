@@ -32,18 +32,18 @@ const handleBlockType = (editorState, character) => {
       return changeCurrentBlockType(editorState, blockTypes[i], line.replace(/^#+\s/, ''));
     }
   }
-  let matchArr = line.match(/^[*-] (.*)$/);
+  let matchArr = line.match(/^[*] (.*)$/);
   if (matchArr) {
     return changeCurrentBlockType(editorState, 'unordered-list-item', matchArr[1]);
   }
-  matchArr = line.match(/^[\d]\. (.*)$/);
+  matchArr = line.match(/^[\d]\. (.*)$/); // 1.
   if (matchArr) {
     return changeCurrentBlockType(editorState, 'ordered-list-item', matchArr[1]);
   }
-  matchArr = line.match(/^> (.*)$/);
-  if (matchArr) {
-    return changeCurrentBlockType(editorState, 'blockquote', matchArr[1]);
-  }
+  // matchArr = line.match(/^> (.*)$/);
+  // if (matchArr) {
+  //   return changeCurrentBlockType(editorState, 'blockquote', matchArr[1]);
+  // }
   matchArr = line.match(/^\[([x ])] (.*)$/i);
   if (matchArr && blockType === 'unordered-list-item') {
     return changeCurrentBlockType(editorState, CHECKABLE_LIST_ITEM, matchArr[2], { checked: matchArr[1] !== ' ' });

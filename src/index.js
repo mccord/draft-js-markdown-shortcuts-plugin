@@ -21,6 +21,8 @@ import { replaceText } from './utils';
 
 const INLINE_STYLE_CHARACTERS = [' ', '*', '_'];
 
+console.log("INLIEN STYLE ", INLINE_STYLE_CHARACTERS);
+
 function checkCharacterForState(editorState, character) {
   let newEditorState = handleBlockType(editorState, character);
   if (editorState === newEditorState) {
@@ -46,21 +48,21 @@ function checkReturnForState(editorState, ev) {
   if (/-list-item$/.test(type) && text === '') {
     newEditorState = leaveList(editorState);
   }
-  if (newEditorState === editorState &&
-    (ev.ctrlKey || ev.shiftKey || ev.metaKey || ev.altKey || /^header-/.test(type))) {
-    newEditorState = insertEmptyBlock(editorState);
-  }
+  ////// if (newEditorState === editorState &&
+  //////   (ev.ctrlKey || ev.shiftKey || ev.metaKey || ev.altKey || /^header-/.test(type))) {
+  //////   newEditorState = insertEmptyBlock(editorState);
+  ////// }
   if (newEditorState === editorState && type !== 'code-block' && /^```([\w-]+)?$/.test(text)) {
     newEditorState = handleNewCodeBlock(editorState);
   }
-  if (newEditorState === editorState && type === 'code-block') {
-    if (/```\s*$/.test(text)) {
-      newEditorState = changeCurrentBlockType(newEditorState, type, text.replace(/\n```\s*$/, ''));
-      newEditorState = insertEmptyBlock(newEditorState);
-    } else {
-      newEditorState = insertText(editorState, '\n');
-    }
-  }
+  // if (newEditorState === editorState && type === 'code-block') {
+  //   if (/```\s*$/.test(text)) {
+  //     newEditorState = changeCurrentBlockType(newEditorState, type, text.replace(/\n```\s*$/, ''));
+  //     newEditorState = insertEmptyBlock(newEditorState);
+  //   } else {
+  //     newEditorState = insertText(editorState, '\n');
+  //   }
+  // }
 
   return newEditorState;
 }
