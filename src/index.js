@@ -21,8 +21,6 @@ import { replaceText } from './utils';
 
 const INLINE_STYLE_CHARACTERS = [' ', '*', '_'];
 
-console.log("INLIEN STYLE ", INLINE_STYLE_CHARACTERS);
-
 function checkCharacterForState(editorState, character) {
   let newEditorState = handleBlockType(editorState, character);
   if (editorState === newEditorState) {
