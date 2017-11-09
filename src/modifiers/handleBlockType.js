@@ -1,6 +1,7 @@
 import { CHECKABLE_LIST_ITEM } from 'draft-js-checkable-list-item';
 import { RichUtils } from 'draft-js';
 import changeCurrentBlockType from './changeCurrentBlockType';
+import insertEmptyBlock from './insertEmptyBlock';
 
 const sharps = (len) => {
   let ret = '';
@@ -21,7 +22,7 @@ const handleBlockType = (editorState, character) => {
   if (line.indexOf('# ') === 0) {
     return changeCurrentBlockType(editorState, 'header-three', line.replace(/^#+\s/, ''));
   }
- 
+
   let matchArr = line.match(/^[*] (.*)$/);
   if (matchArr) {
     return changeCurrentBlockType(editorState, 'unordered-list-item', matchArr[1]);

@@ -1,6 +1,9 @@
 import React from 'react';
 import {
-  blockRenderMap as checkboxBlockRenderMap, CheckableListItem, CheckableListItemUtils, CHECKABLE_LIST_ITEM
+  blockRenderMap as checkboxBlockRenderMap,
+  CheckableListItem,
+  CheckableListItemUtils,
+  CHECKABLE_LIST_ITEM
 } from 'draft-js-checkable-list-item';
 
 import { Map } from 'immutable';
@@ -43,15 +46,18 @@ function checkReturnForState(editorState, ev) {
   const currentBlock = contentState.getBlockForKey(key);
   const type = currentBlock.getType();
   const text = currentBlock.getText();
-  if (/-list-item$/.test(type) && text === '') {
-    newEditorState = leaveList(editorState);
+
+  if (text === '---') {
+    newEditorState = changeCurrentBlockType(editorState, 'horizontal-rule', '');
+    return insertEmptyBlock(newEditorState);
   }
-  ////// if (newEditorState === editorState &&
-  //////   (ev.ctrlKey || ev.shiftKey || ev.metaKey || ev.altKey || /^header-/.test(type))) {
-  //////   newEditorState = insertEmptyBlock(editorState);
-  ////// }
-  if (newEditorState === editorState && type !== 'code-block' && /^```([\w-]+)?$/.test(text)) {
-    newEditorState = handleNewCodeBlock(editorState);
+
+  if (/-list-item$/.test(type) && text === '') {
+    return leaveList(editorState);
+  }
+
+  if (type !== 'code-block' && /^```([\w-]+)?$/.test(text)) {
+    return handleNewCodeBlock(editorState);
   }
   // if (newEditorState === editorState && type === 'code-block') {
   //   if (/```\s*$/.test(text)) {
