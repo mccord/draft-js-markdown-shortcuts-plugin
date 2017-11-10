@@ -23,7 +23,7 @@ const handleBlockType = (editorState, character) => {
     return changeCurrentBlockType(editorState, 'header-three', line.replace(/^#+\s/, ''));
   }
 
-  let matchArr = line.match(/^[*] (.*)$/);
+  let matchArr = line.match(/^[*-] (.*)$/);
   if (matchArr) {
     return changeCurrentBlockType(editorState, 'unordered-list-item', matchArr[1]);
   }
