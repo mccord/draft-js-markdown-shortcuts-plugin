@@ -32,9 +32,9 @@ function checkCharacterForState(editorState, character) {
   if (editorState === newEditorState) {
     newEditorState = handleLink(editorState, character);
   }
-  // if (editorState === newEditorState) {
-  //   newEditorState = handleInlineStyle(editorState, character);
-  // }
+  if (editorState === newEditorState) {
+    newEditorState = handleInlineStyle(editorState, character);
+  }
   return newEditorState;
 }
 
