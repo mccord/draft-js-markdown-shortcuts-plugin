@@ -24,7 +24,11 @@ const handleBlockType = (editorState, character) => {
   }
 
   let matchArr = line.match(/^[*-] (.*)$/);
-  if (matchArr) {
+  if (
+    (line.indexOf('-') === '0' || line.indexOf('*') === 0) &&
+    currentSelection.getStartOffset() === 1 &&
+    character === ' '
+  ) {
     return changeCurrentBlockType(editorState, 'unordered-list-item', matchArr[1]);
   }
   matchArr = line.match(/^[\d]\. (.*)$/); // 1.

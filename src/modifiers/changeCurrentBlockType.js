@@ -1,21 +1,34 @@
-import { EditorState } from 'draft-js';
+import { EditorState, Modifier } from 'draft-js';
 
 const changeCurrentBlockType = (editorState, type, text, blockMetadata = {}) => {
-  const currentContent = editorState.getCurrentContent();
+  const originalContentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
   const key = selection.getStartKey();
-  const blockMap = currentContent.getBlockMap();
+  const blockMap = originalContentState.getBlockMap();
   const block = blockMap.get(key);
-  const data = block.getData().merge(blockMetadata);
-  const newBlock = block.merge({ type, data, text: text || '' });
+
+  // step 1: delete the markdown shortcut characters (for example, '# ' or '* ').
+  // need to use Modifier to do this in order to preserve entity and inline style ranges properly.
+  const previousText = originalContentState.getBlockMap().get(key).getText();
+  const difference = text.length - previousText.length;
+
+  let newContentState = Modifier.removeRange(
+    originalContentState,
+    selection.merge({anchorKey: key, focusKey: key, anchorOffset: 0, focusOffset: difference * -1, isBackward: false}),
+    'forward'
+  );
+
+  // step 2: change the block type
+  const newerBlock = newContentState.getBlockMap().get(key).merge({ type, });
   const newSelection = selection.merge({
     anchorOffset: 0,
     focusOffset: 0,
   });
-  const newContentState = currentContent.merge({
-    blockMap: blockMap.set(key, newBlock),
+  newContentState = newContentState.merge({
+    blockMap: newContentState.getBlockMap().set(key, newerBlock),
     selectionAfter: newSelection,
   });
+  
   return EditorState.push(
     editorState,
     newContentState,
