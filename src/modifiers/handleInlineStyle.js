@@ -1,41 +1,90 @@
 import changeCurrentInlineStyle from './changeCurrentInlineStyle';
-
-const inlineMatchers = {
-  // BOLD: [
-  //   /\*\*([^(?:**)]+)\*\*/g,
-  //   /__([^(?:__)]+)__/g
-  // ],
-  // ITALIC: [
-  //   /\*([^*]+)\*/g,
-  //   /_([^_]+)_/g
-  // ],
-  CODE: [
-    /`([^`]+)`/g
-  ],
-  // STRIKETHROUGH: [
-  //   /~~([^(?:~~)]+)~~/g
-  // ]
-};
+import { Modifier, EditorState } from 'draft-js';
 
 const handleInlineStyle = (editorState, character) => {
-  const key = editorState.getSelection().getStartKey();
+  const originalContentState = editorState.getCurrentContent();
+  const currentSelection = editorState.getSelection();
+  const key = currentSelection.getStartKey();
   const text = editorState.getCurrentContent().getBlockForKey(key).getText();
-  const line = `${text}${character}`;
-  let newEditorState = editorState;
-  Object.keys(inlineMatchers).some((k) => {
-    inlineMatchers[k].some((re) => {
-      let matchArr;
-      do {
-        matchArr = re.exec(line);
-        if (matchArr) {
-          newEditorState = changeCurrentInlineStyle(newEditorState, matchArr, k);
-        }
-      } while (matchArr);
-      return newEditorState !== editorState;
+  const cursorPosition = currentSelection.getStartOffset();
+  const characterAtPosition = text[cursorPosition - 1];
+
+  if (character === ' ' && characterAtPosition === '`') {
+    const startPosition = text.indexOf('`');
+    if (startPosition < 0) {
+      return editorState;
+    }
+    let newContentState = originalContentState;
+
+    // step 1: add a space (" ") after the ` (to separate it from the codeblock)
+    const selectionToInsertSpace = currentSelection.merge({
+      anchorKey: key,
+      focusKey: key,
+      anchorOffset: cursorPosition,
+      focusOffset: cursorPosition,
     });
-    return newEditorState !== editorState;
-  });
-  return newEditorState;
+    newContentState = Modifier.insertText(
+      newContentState,
+      selectionToInsertSpace,
+      ' '
+    );
+
+    // step 2: apply an inline style
+    const selectionToStyle = currentSelection.merge({
+      anchorKey: key,
+      focusKey: key,
+      anchorOffset: startPosition,
+      focusOffset: cursorPosition,
+    });
+    newContentState = Modifier.applyInlineStyle(
+      newContentState,
+      selectionToStyle,
+      'CODE'
+    );
+
+    // step 3: remove the backticks
+    const selectionToRemove1 = currentSelection.merge({
+      anchorKey: key,
+      focusKey: key,
+      anchorOffset: cursorPosition - 1,
+      focusOffset: cursorPosition,
+    });
+    const selectionToRemove2 = currentSelection.merge({
+      anchorKey: key,
+      focusKey: key,
+      anchorOffset: startPosition,
+      focusOffset: startPosition + 1,
+    });
+    newContentState = Modifier.removeRange(
+      newContentState,
+      selectionToRemove1,
+      'forward'
+    );
+    newContentState = Modifier.removeRange(
+      newContentState,
+      selectionToRemove2,
+      'forward'
+    );
+
+    // step 4: move the cursor to after the space
+    const selectionAfter = currentSelection.merge({
+      anchorKey: key,
+      focusKey: key,
+      anchorOffset: cursorPosition - 1,
+      focusOffset: cursorPosition - 1,
+    });
+    newContentState = newContentState.merge({
+      selectionAfter,
+    });
+
+    return EditorState.push(
+      editorState,
+      newContentState,
+      'change-inline-style'
+    );
+  }
+
+  return editorState;
 };
 
 export default handleInlineStyle;
