@@ -11,7 +11,8 @@ const handleInlineStyle = (editorState, character) => {
 
   if (character === ' ' && characterAtPosition === '`') {
     const startPosition = text.indexOf('`');
-    if (startPosition < 0) {
+    if (startPosition < 0 || startPosition === cursorPosition - 1) {
+      // there is no matching backtick, or we are looking at the same backtick
       return editorState;
     }
     let newContentState = originalContentState;
