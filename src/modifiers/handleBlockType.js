@@ -2,6 +2,7 @@ import { CHECKABLE_LIST_ITEM } from 'draft-js-checkable-list-item';
 import { RichUtils } from 'draft-js';
 import changeCurrentBlockType from './changeCurrentBlockType';
 import insertEmptyBlock from './insertEmptyBlock';
+import $ from '~/shared/$.js';
 
 const sharps = (len) => {
   let ret = '';
@@ -18,6 +19,28 @@ const handleBlockType = (editorState, character) => {
   const position = currentSelection.getAnchorOffset();
   const line = [text.slice(0, position), character, text.slice(position)].join('');
   const blockType = RichUtils.getCurrentBlockType(editorState);
+
+  const contentState = editorState.getCurrentContent();
+  const anchorKey = currentSelection.getAnchorKey();
+  const focusKey = currentSelection.getFocusKey();
+  const anchorBlock = contentState.getBlockForKey(anchorKey);
+  const focusBlock = contentState.getBlockForKey(focusKey);
+
+  const notSupportedBlockTypes = [
+    'code-block',
+    'blockquote',
+    'header-three',
+    'unordered-list-item',
+    'ordered-list-item',
+  ];
+  const shouldNotAllowBlocks = $.aContainsAll(
+    notSupportedBlockTypes,
+    [anchorBlock.getType(), focusBlock.getType()]
+  );
+
+  if (shouldNotAllowBlocks) {
+    return editorState;
+  }
 
   if (line.indexOf('# ') === 0) {
     return changeCurrentBlockType(editorState, 'header-three', line.replace(/^#+\s/, ''));
