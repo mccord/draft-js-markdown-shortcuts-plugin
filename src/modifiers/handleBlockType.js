@@ -48,7 +48,7 @@ const handleBlockType = (editorState, character) => {
 
   let matchArr = line.match(/^[*-] (.*)$/);
   if (
-    (line.indexOf('-') === '0' || line.indexOf('*') === 0) &&
+    (line.indexOf('-') === 0 || line.indexOf('*') === 0) &&
     currentSelection.getStartOffset() === 1 &&
     character === ' '
   ) {
