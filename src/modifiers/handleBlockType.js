@@ -54,9 +54,9 @@ const handleBlockType = (editorState, character) => {
   ) {
     return changeCurrentBlockType(editorState, 'unordered-list-item', matchArr[1]);
   }
-  matchArr = line.match(/^[\d]\. (.*)$/); // 1.
+  matchArr = line.match(/^[0-9]{1,2}\. (.*)$/); // 1.
   if (matchArr) {
-    return changeCurrentBlockType(editorState, 'ordered-list-item', matchArr[1]);
+    return changeCurrentBlockType(editorState, 'ordered-list-item', matchArr[1], { 'startValue': matchArr[0].substring(0, matchArr[0].length - 2)});
   }
   // matchArr = line.match(/^> (.*)$/);
   // if (matchArr) {
