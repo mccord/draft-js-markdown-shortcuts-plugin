@@ -19,7 +19,7 @@ const changeCurrentBlockType = (editorState, type, text, blockMetadata = {}) => 
   );
 
   // step 2: change the block type
-  const newerBlock = newContentState.getBlockMap().get(key).merge({ type, });
+  const newerBlock = newContentState.getBlockMap().get(key).merge({ type, data: blockMetadata});
   const newSelection = selection.merge({
     anchorOffset: 0,
     focusOffset: 0,
@@ -28,7 +28,7 @@ const changeCurrentBlockType = (editorState, type, text, blockMetadata = {}) => 
     blockMap: newContentState.getBlockMap().set(key, newerBlock),
     selectionAfter: newSelection,
   });
-  
+
   return EditorState.push(
     editorState,
     newContentState,
